@@ -75,7 +75,7 @@ def main():
     Осуществляет взаимодействие с пользователем, обрабатывает пользовательский ввод
     """
     session = connect_db()
-    print(len(find_gender_age_gold_medal('Male',25,  session)))
+    print(datetime.datetime.utcnow().strftime('%d.%m.%Y'))
 
 
 

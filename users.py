@@ -75,7 +75,8 @@ def request_data():
     while not valid_date(birthdate):
         birthdate = str(input('Введите дату рождения:'))
         if not valid_date(birthdate):
-            print("Неправильный формат даты! Необходимо ввести в формате {}".format(datetime.datetime.utcnow.date()).strptime('%d.%m.%Y'))
+            print("Неправильный формат даты! Необходимо ввести в формате {}"
+            .format(datetime.datetime.utcnow().strftime('%d.%m.%Y')))
 
     height = float(input('Введите рост пользователя:'))
 
@@ -103,7 +104,6 @@ def main():
         enter_next_user = str(input("Будем вводить еще пользователя?(Y/N)")) == 'Y'
     else:
         session.commit()
-
 
 
 if __name__ == "__main__":
