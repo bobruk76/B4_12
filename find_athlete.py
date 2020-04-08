@@ -19,7 +19,7 @@ class Athelete(Base):
     __tablename__ = 'athelete'
 
     # поля таблицы
-    id = sa.Column(sa.Integer, primary_key=True)
+    id = sa.Column(sa.Integer, primary_key=True,  autoincrement=True)
     age = sa.Column(sa.Integer)
     birthdate = sa.Column(sa.Text)
     gender = sa.Column(sa.Text)
@@ -33,36 +33,36 @@ class Athelete(Base):
     sport  = sa.Column(sa.Text)
     country  = sa.Column(sa.Text)
 
-class User(Base):
-    """
-    Описывает структуру таблицы user для хранения регистрационных данных пользователей
-    """
-    # задаем название таблицы
-    __tablename__ = 'user'
+def find_by_id(id, session):
+    query = session.query(Athelete).filter(Athelete.id == id)
 
-    # поля таблицы
-    id = sa.Column(sa.String(36), primary_key=True)
-    first_name = sa.Column(sa.Text)
-    last_name = sa.Column(sa.Text)
-    gender = sa.Column(sa.Text)
-    email = sa.Column(sa.Text)
-    birthdate = sa.Column(sa.Text)
-    height = sa.Column(sa.REAL)
+    return [item for item in query.all()]
 
-def find_gender(gender, session):
-    query = session.query(Athelete).filter(Athelete.gender == gender)
+def str_to_date(date_text):
+    return datetime.datetime.strptime(date_text, '%Y-%m-%d')
 
-    return [item.name for item in query.all()]
+def days_between_two_date(d1,d2):
+    return (d2 - d1 if d2 > d1 else d1 - d2).days
 
-def find_age(age, session):
-    query = session.query(Athelete).filter(Athelete.age > age)
+def my_map(function, iterable):
+    # создаем переменную для хранения результата
+    result = []
+    # пробегаемся по всем элементам контейнера iterable
+    for item in iterable:
+        # вычисляем значение функции function на текущем элементе item
+        value = function(item)
+        # сохраняем полученное значение
+        result.append(value)
+    # возвращаем полученный список
+    return resul
 
-    return [item.name for item in query.all()]
+def find_by_birthdate(date_text, cnt_ath, session):
+    query = session.query(Athelete).filter(Athelete.id == id)
 
-def find_gender_age_gold_medal(gender, age, session):
-    query = session.query(Athelete).filter(Athelete.gender == gender).filter(Athelete.age > age).filter(Athelete.gold_medals > 1)
+    return [item for item in query.all()]
 
-    return [item.name for item in query.all()]
+
+
 
 def connect_db():
     engine = sa.create_engine(DB_PATH)
@@ -75,7 +75,14 @@ def main():
     Осуществляет взаимодействие с пользователем, обрабатывает пользовательский ввод
     """
     session = connect_db()
-    print(datetime.datetime.utcnow().strftime('%d.%m.%Y'))
+    user_id = int(input('Введите ID спортсмена:'))
+    users = find_by_id(user_id, session)
+    if len(users) == 0:
+        print('К сожалению такого спортсмена найти не удалось!(((\n')
+    else:
+        user = users[0]
+        print('{} -- {} -- {} -- {}'.format(user.id, user.name, user.birthdate, user.height))
+
 
 
 
