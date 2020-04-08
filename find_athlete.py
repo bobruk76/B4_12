@@ -83,7 +83,7 @@ def main():
     user_id = int(input('Введите ID спортсмена:'))
     user = find_by_id(user_id, query)
     if user is None:
-        print('К сожалению такого спортсмена найти не удалось!(((\n')
+        print('К сожалению такого спортсмена найти не удалось!(((')
     else:
         print('Найден следующий спортсмен: {}'.format(user))
         users = find_athelete(user, query)
