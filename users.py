@@ -19,7 +19,7 @@ class User(Base):
     __tablename__ = 'user'
 
     # поля таблицы
-    id = sa.Column(sa.Integer, primary_key=True)
+    id = sa.Column(sa.Integer, primary_key=True,  autoincrement=True)
     first_name = sa.Column(sa.Text)
     last_name = sa.Column(sa.Text)
     gender = sa.Column(sa.Text)
@@ -41,6 +41,13 @@ gender_set = ('Male', 'Female', 'Other')
 def valid_gender(gender):
     return gender in gender_set
 
+def valid_date(date_text):
+    try:
+        datetime.datetime.strptime(date_text, '%d.%m.%Y')
+        return True
+    except:
+        return False
+
 def request_data():
 
     """
@@ -60,14 +67,20 @@ def request_data():
 
     email =''
     while not valid_email(email):
-        email = input("Адрес электронной почты: ")
+        email = str(input("Адрес электронной почты: "))
         if not valid_email(email):
             print('Неправильный формат электронной почты!')
 
-    user_id = str(uuid.uuid4())
+    birthdate = ''
+    while not valid_date(birthdate):
+        birthdate = str(input('Введите дату рождения:'))
+        if not valid_date(birthdate):
+            print("Неправильный формат даты! Необходимо ввести в формате {}".format(datetime.datetime.utcnow.date()).strptime('%d.%m.%Y'))
+
+    height = float(input('Введите рост пользователя:'))
+
     # создаем нового пользователя
     user = User(
-        id=user_id,
         first_name=first_name,
         last_name=last_name,
         gender = gender,
@@ -83,8 +96,13 @@ def main():
     Осуществляет взаимодействие с пользователем, обрабатывает пользовательский ввод
     """
     session = connect_db()
-    print(request_data())
 
+    enter_next_user = True
+    while enter_next_user:
+        session.add(request_data())
+        enter_next_user = str(input("Будем вводить еще пользователя?(Y/N)")) == 'Y'
+    else:
+        session.commit()
 
 
 
