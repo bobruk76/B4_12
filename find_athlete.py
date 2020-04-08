@@ -1,5 +1,6 @@
 import uuid
 import datetime
+import math
 
 # импортируем библиотеку sqlalchemy и некоторые функции из нее
 import sqlalchemy as sa
@@ -23,7 +24,7 @@ class Athelete(Base):
     age = sa.Column(sa.Integer)
     birthdate = sa.Column(sa.Text)
     gender = sa.Column(sa.Text)
-    height = sa.Column(sa.REAL)
+    height = sa.Column(sa.Float)
     name = sa.Column(sa.Text)
     weight = sa.Column(sa.Integer)
     gold_medals = sa.Column(sa.Integer)
@@ -33,36 +34,39 @@ class Athelete(Base):
     sport  = sa.Column(sa.Text)
     country  = sa.Column(sa.Text)
 
-def find_by_id(id, session):
-    query = session.query(Athelete).filter(Athelete.id == id)
+    def __repr__(self):
+        return "'%s', '%s', '%s', '%s'" % (self.id, self.name, self.birthdate, self.height)
 
-    return [item for item in query.all()]
+def find_by_id(id, query):
+    result = [item for item in query if item.id == id]
 
-def str_to_date(date_text):
-    return datetime.datetime.strptime(date_text, '%Y-%m-%d')
+    return result[0] if len(result) > 0 else None
 
-def days_between_two_date(d1,d2):
-    return (d2 - d1 if d2 > d1 else d1 - d2).days
+def find_athelete(user, query):
 
-def my_map(function, iterable):
-    # создаем переменную для хранения результата
-    result = []
-    # пробегаемся по всем элементам контейнера iterable
-    for item in iterable:
-        # вычисляем значение функции function на текущем элементе item
-        value = function(item)
-        # сохраняем полученное значение
-        result.append(value)
-    # возвращаем полученный список
-    return resul
+    def str_to_date(date_text):
+        return datetime.datetime.strptime(date_text, '%Y-%m-%d')
 
-def find_by_birthdate(date_text, cnt_ath, session):
-    query = session.query(Athelete).filter(Athelete.id == id)
+    def days_between_two_date(str_d1,str_d2):
+        d1 = str_to_date(str_d1)
+        d2 = str_to_date(str_d2)
 
-    return [item for item in query.all()]
+        return (d2 - d1 if d2 > d1 else d1 - d2).days
 
+    def difference(f1, f2):
+        if f1 == None:
+            f1 = 0
 
+        if f2 == None:
+            f2 = 0
 
+        return abs(f1-f2)
+
+    result = [[item.id, days_between_two_date(user.birthdate, item.birthdate), difference(item.height, user.height)] for item in query if item.id != user.id]
+    list_result = [it[0] for it in sorted(result, key=lambda item: item[1])][:1]
+    list_result += [it[0] for it in sorted(result, key=lambda item: item[2])][:1]
+
+    return [item for item in query if item.id in list_result]
 
 def connect_db():
     engine = sa.create_engine(DB_PATH)
@@ -75,13 +79,16 @@ def main():
     Осуществляет взаимодействие с пользователем, обрабатывает пользовательский ввод
     """
     session = connect_db()
+    query = session.query(Athelete).all()
     user_id = int(input('Введите ID спортсмена:'))
-    users = find_by_id(user_id, session)
-    if len(users) == 0:
+    user = find_by_id(user_id, query)
+    if user is None:
         print('К сожалению такого спортсмена найти не удалось!(((\n')
     else:
-        user = users[0]
-        print('{} -- {} -- {} -- {}'.format(user.id, user.name, user.birthdate, user.height))
+        print('Найден следующий спортсмен: {}'.format(user))
+        users = find_athelete(user, query)
+        print('Ближайший по дате рождения: %s' % users[1])
+        print('Ближайший по росту: %s' % users[0])
 
 
 
